@@ -4,9 +4,6 @@ from selenium import webdriver
 
 import os
 
-# profile = input("Enter Instagram profile name: ")
-# url = 'https://www.instagram.com/' + profile
-
 
 
 class VideoDownloader:
@@ -25,7 +22,6 @@ class VideoDownloader:
             self.lastkey = self.get_lastkey()
             f.write(self.lastkey)
             f.close()
-            print('created .txt')
 
     
     def new_videos(self):
@@ -40,20 +36,15 @@ class VideoDownloader:
                 new.append(media.a['href'])
             else:
                 break
-        if new == []:
-            print('no new videos')
-        else:
-            print(f'new videos {new}')
 
         return new
 
 
-    def download_photo_video(self, uri):
+    def download_video(self, uri):
         media_url = 'https://www.instagram.com' + uri
         self.driver.get(media_url)
         media_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         video = media_soup.find('video', class_='tWeCl')
-        # photo = media_soup.find('img', class_='FFVAD')
 
         if(video):
             video_url = video['src']
@@ -61,22 +52,12 @@ class VideoDownloader:
             r = requests.get(video_url)
 
             file = "instagram_video.mp4"
-            print('downloading video')
             with open(file,'wb') as f: 
                 f.write(r.content)
-            print('downloaded')
 
             return file
         else:
             return None
-
-        # if(photo):
-        #     photo_url = photo['src']
-
-        #     r = requests.get(photo_url)
-
-        #     file = "instagram_photo.jpg"
-        #     print('downloading photo')
 
 
     def get_lastkey(self):
@@ -84,7 +65,6 @@ class VideoDownloader:
 
         soup = BeautifulSoup(self.driver.page_source, 'lxml')
         media_list = soup.find_all('div', class_='v1Nh3')
-        print('got last key')
 
         return media_list[-1].a['href']
 
@@ -97,7 +77,6 @@ class VideoDownloader:
             f.seek(0)
             f.write(str(new_key))
             f.truncate()
-        print('updated last key')
 
         return new_key
 

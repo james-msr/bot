@@ -2,26 +2,17 @@ import asyncio
 import aioschedule
 import logging
 
-from aiogram import Dispatcher, Bot, executor, types
+from aiogram import Dispatcher, Bot, executor
 
 from media import VideoDownloader
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = '<BOT TOKEN>'
+BOT_TOKEN = '1810785353:AAH-B0PyPYT-1n_KZR-rcAl5gYA7iEcEicA'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
 vd = VideoDownloader("lastkey.txt")
-
-@dp.message_handler(commands=['start', 'help'])
-async def send_welcome(message: types.Message):
-    await message.reply("Hi!\nI'm MediaBot!\nPowered by aiogram.")
-
-
-@dp.message_handler()
-async def echo(message: types.Message):
-    await message.answer(message.text)
 
 
 async def process_post():
@@ -30,12 +21,10 @@ async def process_post():
     if(new_videos):
         new_videos.reverse()
         for nv in new_videos:
-            if(vd.download_photo_video(nv)):
-                with open(vd.download_photo_video(nv), 'rb') as video:
-                    await bot.send_video('<bot id>', video)
-                print('video sent')
-            else:
-                print('it was photo')
+            video = vd.download_photo_video(nv)
+            if(video):
+                with open(video, 'rb') as v:
+                    await bot.send_video('@dnevnikdalnoboyshika', v)
 				
             vd.update_lastkey(nv)
 
