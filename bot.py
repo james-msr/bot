@@ -29,7 +29,7 @@ async def process_post():
             vd.update_lastkey(nv)
 
 async def scheduler():
-    aioschedule.every().day.at("10:39").do(process_post)
+    aioschedule.every().day.at("12:00").do(process_post)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(10)

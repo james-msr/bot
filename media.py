@@ -7,7 +7,7 @@ import os
 
 
 class VideoDownloader:
-    url = 'https://www.instagram.com/gym.legends_ig/'
+    url = 'https://www.instagram.com/group_dalnoboi/'
     driver = webdriver.Chrome('chromedriver')
     lastkey = ""
     lastkey_file = ""
