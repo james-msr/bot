@@ -7,7 +7,7 @@ import os
 
 
 class VideoDownloader:
-    url = '<instagram url>'
+    url = 'https://www.instagram.com/group_dalnoboi/'
     driver = webdriver.Chrome('chromedriver')
     lastkey = ""
     lastkey_file = ""
@@ -45,6 +45,7 @@ class VideoDownloader:
         self.driver.get(media_url)
         media_soup = BeautifulSoup(self.driver.page_source, 'lxml')
         video = media_soup.find('video', class_='tWeCl')
+        text = media_soup.find('div', class_='C4VMK')
 
         if(video):
             video_url = video['src']
@@ -52,10 +53,13 @@ class VideoDownloader:
             r = requests.get(video_url)
 
             file = "instagram_video.mp4"
+            caption = text.span.contents[0].strip() + '\n' + '[Дневник Дальнобойщика](https://t.me/dalnob0)'
             with open(file,'wb') as f: 
                 f.write(r.content)
+            
+            video_content = [file, caption]
 
-            return file
+            return video_content
         else:
             return None
 
@@ -80,3 +84,12 @@ class VideoDownloader:
 
         return new_key
 
+
+
+# url = 'https://www.instagram.com/p/CQIRuVyiQFo/'
+# driver = webdriver.Chrome('chromedriver')
+# driver.get(url)
+# media_soup = BeautifulSoup(driver.page_source, 'lxml')
+# text = media_soup.find('div', class_='C4VMK')
+
+# print(text.span.contents[0].strip())

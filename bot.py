@@ -7,7 +7,7 @@ from aiogram import Dispatcher, Bot, executor
 from media import VideoDownloader
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = '<Bot token>'
+BOT_TOKEN = '1810785353:AAH-B0PyPYT-1n_KZR-rcAl5gYA7iEcEicA'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
@@ -21,15 +21,20 @@ async def process_post():
     if(new_videos):
         new_videos.reverse()
         for nv in new_videos:
-            video = vd.download_photo_video(nv)
+            video = vd.download_video(nv)
             if(video):
-                with open(video, 'rb') as v:
-                    await bot.send_video('<chat id>', v)
+                with open(video[0], 'rb') as v:
+                    await bot.send_video('@dalnob0', v, caption=video[1], parse_mode='MarkdownV2')
 				
             vd.update_lastkey(nv)
 
 async def scheduler():
-    aioschedule.every().day.at("12:00").do(process_post)
+    aioschedule.every().day.at("08:00").do(process_post)
+    aioschedule.every().day.at("09:30").do(process_post)
+    aioschedule.every().day.at("10:30").do(process_post)
+    aioschedule.every().day.at("16:39").do(process_post)
+    aioschedule.every().day.at("18:00").do(process_post)
+    aioschedule.every().day.at("22:00").do(process_post)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(10)
