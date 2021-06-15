@@ -7,7 +7,7 @@ from aiogram import Dispatcher, Bot, executor
 from media import VideoDownloader
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = '1810785353:AAH-B0PyPYT-1n_KZR-rcAl5gYA7iEcEicA'
+BOT_TOKEN = '<Bot token>'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
@@ -24,7 +24,7 @@ async def process_post():
             video = vd.download_photo_video(nv)
             if(video):
                 with open(video, 'rb') as v:
-                    await bot.send_video('@dnevnikdalnoboyshika', v)
+                    await bot.send_video('<chat id>', v)
 				
             vd.update_lastkey(nv)
 
