@@ -24,7 +24,7 @@ async def process_post():
             video = vd.download_video(nv)
             if(video):
                 with open(video[0], 'rb') as v:
-                    await bot.send_video('@dalnob0', v, caption=video[1], parse_mode='MarkdownV2')
+                    await bot.send_video('@dnevnikdalnoboyshika', v, caption=video[1], parse_mode='markdown')
 				
             vd.update_lastkey(nv)
 
@@ -32,7 +32,7 @@ async def scheduler():
     aioschedule.every().day.at("08:00").do(process_post)
     aioschedule.every().day.at("09:30").do(process_post)
     aioschedule.every().day.at("10:30").do(process_post)
-    aioschedule.every().day.at("16:39").do(process_post)
+    aioschedule.every().day.at("14:00").do(process_post)
     aioschedule.every().day.at("18:00").do(process_post)
     aioschedule.every().day.at("22:00").do(process_post)
     while True:

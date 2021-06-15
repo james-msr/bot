@@ -4,6 +4,7 @@ from selenium import webdriver
 
 import os
 
+from aiogram.utils.markdown import link
 
 
 class VideoDownloader:
@@ -53,7 +54,7 @@ class VideoDownloader:
             r = requests.get(video_url)
 
             file = "instagram_video.mp4"
-            caption = text.span.contents[0].strip() + '\n' + '[Дневник Дальнобойщика](https://t.me/dalnob0)'
+            caption = text.span.contents[0].strip() + '\n' + link('Дневник Дальнобойщика', 'https://t.me/dalnob0/')
             with open(file,'wb') as f: 
                 f.write(r.content)
             
