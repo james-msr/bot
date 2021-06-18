@@ -3,26 +3,27 @@ import requests
 from selenium import webdriver
 
 import os
+import django
 
-from aiogram.utils.markdown import link
+from asgiref.sync import sync_to_async
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bot.settings")
+django.setup()
+
+from scraper.models import Channel
+
 
 
 class VideoDownloader:
-    url = 'https://www.instagram.com/group_dalnoboi/'
     driver = webdriver.Chrome('chromedriver')
     lastkey = ""
-    lastkey_file = ""
+    url = ""
 
-    def __init__(self, lastkey_file):
-        self.lastkey_file = lastkey_file
+    def __init__(self, profile):
+        profile_name = profile.insta
+        self.url = f"https://www.instagram.com/{profile_name}/"
 
-        if os.path.exists(lastkey_file):
-            self.lastkey = open(lastkey_file, 'r').read()
-        else:
-            f = open(lastkey_file, 'w')
-            self.lastkey = self.get_lastkey()
-            f.write(self.lastkey)
-            f.close()
+        self.lastkey = profile.lastkey_insta
 
     
     def new_videos(self):
@@ -54,7 +55,7 @@ class VideoDownloader:
             r = requests.get(video_url)
 
             file = "instagram_video.mp4"
-            caption = text.span.contents[0].strip() + '\n' + link('Дневник Дальнобойщика', 'https://t.me/dalnob0/')
+            caption = text.span.contents[0].strip()
             with open(file,'wb') as f: 
                 f.write(r.content)
             
@@ -64,33 +65,23 @@ class VideoDownloader:
         else:
             return None
 
-
-    def get_lastkey(self):
-        self.driver.get(self.url)
-
-        soup = BeautifulSoup(self.driver.page_source, 'lxml')
-        media_list = soup.find_all('div', class_='v1Nh3')
-
-        return media_list[-1].a['href']
-
     
-    def update_lastkey(self, new_key):
+    def update_lastkey(self, new_key, profile):
         self.lastkey = new_key
 
-        with open(self.lastkey_file, "r+") as f:
-            data = f.read()
-            f.seek(0)
-            f.write(str(new_key))
-            f.truncate()
-
+        profile.lastkey_insta = new_key
+        profile.save()
         return new_key
 
 
+def channels_list():
+    channels = Channel.objects.order_by('id')
 
-# url = 'https://www.instagram.com/p/CQIRuVyiQFo/'
-# driver = webdriver.Chrome('chromedriver')
-# driver.get(url)
-# media_soup = BeautifulSoup(driver.page_source, 'lxml')
-# text = media_soup.find('div', class_='C4VMK')
+    return channels
 
-# print(text.span.contents[0].strip())
+
+def profiles_list(channel):
+    profiles = channel.get_profiles()
+
+    return profiles
+
