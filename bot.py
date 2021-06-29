@@ -5,64 +5,87 @@ import logging
 from aiogram import Dispatcher, Bot, executor
 from aiogram.utils.markdown import link
 
-from media import VideoDownloader, channels_list, profiles_list
+from media import VideoDownloader
 
-# from sqlighter import SQLighter
+from asgiref.sync import sync_to_async
 
-# import os
-# import django
+# Setup django
+import os
+import django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bot.settings")
+django.setup()
 
-
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bot.settings")
-# django.setup()
-
-# from scraper.models import Channel
+from scraper.models import Channel
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = '1810785353:AAH-B0PyPYT-1n_KZR-rcAl5gYA7iEcEicA'
+BOT_TOKEN = '1726412567:AAFpV2OYMvUqurxdmV-a8d3esRxSUNLnzRg'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
-# db = SQLighter('db.sqlite3')
 
+# Send videos
+async def send_media(channel, profile):
+    vd = VideoDownloader(profile)
 
-
-async def process_post():
+    new_videos = vd.new_videos()
+    print('Found new videos')
+    if(new_videos):
+        new_videos.reverse()
+        for nv in new_videos:
+            video = vd.download_video(nv)
+            if(video):
+                print('Downloading video')
+                caption = video[1] + '\n' + link('Подписывайтесь', 'https://t.me/' + channel.channel_name + '/')
+                with open(video[0], 'rb') as v:
+                    print('Sending video')
+                    print(channel.channel_name)
+                    await bot.send_video(str('@' + channel.channel_name), v, caption=caption, parse_mode='markdown')
+                    print('Video sent')
     
+            await vd.update_lastkey(nv, profile)
+            print('Lastkey updated')
 
-    channels = channels_list()
-    for channel in await channels:
+
+# Get the llist of channels where videos are sent
+async def get_channels():
+    channels = await sync_to_async(list)(Channel.objects.all())
+
+    return channels
+
+
+# Get the list of instagram profiles from which videos are got
+async def get_profiles(channel):
+    profiles = await sync_to_async(list)(channel.get_profiles())
+
+    return profiles
+
+
+# Process
+async def process_post():
+    channels = await get_channels()
+    print(channels)
+    for channel in channels:
         if channel.is_active:
-            profiles = profiles_list(channel)
-            for profile in await profiles:
-                vd = VideoDownloader(profile)
+            profiles = await get_profiles(channel)
+            print(profiles)
+            for profile in profiles:
+                await send_media(channel, profile)
 
-                new_videos = vd.new_videos()
-                if(new_videos):
-                    new_videos.reverse()
-                    for nv in new_videos:
-                        video = vd.download_video(nv)
-                        if(video):
-                            caption = video[1] + '\n' + link('Дневник Дальнобойщика', 'https://t.me/' + channel.channel_name[1:] + '/')
-                            with open(video[0], 'rb') as v:
-                                await bot.send_video(channel.channel_name, v, caption=caption, parse_mode='markdown')
-				
-                    vd.update_lastkey(nv, profile)
 
 async def scheduler():
     aioschedule.every().day.at("08:00").do(process_post)
     aioschedule.every().day.at("09:30").do(process_post)
     aioschedule.every().day.at("10:30").do(process_post)
-    aioschedule.every().day.at("17:54").do(process_post)
-    aioschedule.every().day.at("18:00").do(process_post)
+    aioschedule.every().day.at("14:00").do(process_post)
+    aioschedule.every().day.at("17:45").do(process_post)
     aioschedule.every().day.at("22:00").do(process_post)
     while True:
         await aioschedule.run_pending()
         await asyncio.sleep(10)
 
 async def on_startup(_):
-    asyncio.create_task(scheduler())
+    await asyncio.create_task(scheduler())
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)

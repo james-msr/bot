@@ -66,22 +66,11 @@ class VideoDownloader:
             return None
 
     
-    def update_lastkey(self, new_key, profile):
+    async def update_lastkey(self, new_key, profile):
         self.lastkey = new_key
 
         profile.lastkey_insta = new_key
-        profile.save()
-        return new_key
-
-
-def channels_list():
-    channels = Channel.objects.order_by('id')
-
-    return channels
-
-
-def profiles_list(channel):
-    profiles = channel.get_profiles()
-
-    return profiles
+        async_save = sync_to_async(profile.save)
+        
+        await async_save()
 
