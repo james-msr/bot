@@ -18,7 +18,7 @@ django.setup()
 from scraper.models import Channel
 
 logging.basicConfig(level=logging.INFO)
-BOT_TOKEN = '1726412567:AAFpV2OYMvUqurxdmV-a8d3esRxSUNLnzRg'
+BOT_TOKEN = '1988732430:AAEHiVTWHHyQJSpyY8PH0JF-YvZDemVbXwI'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
@@ -76,9 +76,9 @@ async def process_post():
 async def scheduler():
     aioschedule.every().day.at("08:00").do(process_post)
     aioschedule.every().day.at("09:30").do(process_post)
-    aioschedule.every().day.at("10:30").do(process_post)
+    aioschedule.every().day.at("12:00").do(process_post)
     aioschedule.every().day.at("14:00").do(process_post)
-    aioschedule.every().day.at("17:45").do(process_post)
+    aioschedule.every().day.at("18:00").do(process_post)
     aioschedule.every().day.at("22:00").do(process_post)
     while True:
         await aioschedule.run_pending()

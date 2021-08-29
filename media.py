@@ -55,7 +55,10 @@ class VideoDownloader:
             r = requests.get(video_url)
 
             file = "instagram_video.mp4"
-            caption = text.span.contents[0].strip()
+            try:
+                caption = text.span.contents[0].strip()
+            except:
+                caption = ''
             with open(file,'wb') as f: 
                 f.write(r.content)
             
